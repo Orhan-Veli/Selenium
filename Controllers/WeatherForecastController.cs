@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,29 +13,20 @@ namespace SeleniumExampleProject.Controllers
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
     {
-        private static readonly string[] Summaries = new[]
-        {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
-
         private readonly ILogger<WeatherForecastController> _logger;
-
         public WeatherForecastController(ILogger<WeatherForecastController> logger)
         {
             _logger = logger;
         }
 
         [HttpGet]
-        public IEnumerable<WeatherForecast> Get()
+        public IActionResult GetWeatherFromMeteorology()
         {
-            var rng = new Random();
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            {
-                Date = DateTime.Now.AddDays(index),
-                TemperatureC = rng.Next(-20, 55),
-                Summary = Summaries[rng.Next(Summaries.Length)]
-            })
-            .ToArray();
+            IWebDriver _webDriver = new ChromeDriver(@"C:\Users\orhan\source\repos\SeleniumExampleProject\SeleniumExampleProject\bin\Debug\netcoreapp3.1");
+            _webDriver.Navigate().GoToUrl("https://www.mgm.gov.tr/");
+            var data = _webDriver.FindElement(By.ClassName("pull-left")).FindElement(By.ClassName("ng-binding")).Text;
+            _webDriver.Quit();
+            return Ok(data);
         }
     }
 }
